@@ -1,16 +1,19 @@
-import urllib2
+import requests
+import requests_toolbelt.adapters.appengine
 from bs4 import BeautifulSoup
-from db.models import *
+from models import *
 import re
+from datetime import date
 
-def parse_month(datetext) {
+requests_toolbelt.adapters.appengine.monkeypatch()
+
+def parse_month(datetext):
     dateStrip = datetext.replace("\r\n","").strip().encode("utf-8")
     day = re.search("\s\d{1,2}", dateStrip).group().strip()
     month = find_month(str(dateStrip.split()[1]))
     return date(day=int(day), month=month, year=int(dateStrip[-4:])).strftime('%Y-%m-%d')
-}    
 
-def find_month(self,strMonth):
+def find_month(strMonth):
     if(strMonth == 'January'):
         return 1
     elif(strMonth == 'February'):
@@ -46,15 +49,20 @@ def scrape_menus():
         "http://menu.hfs.psu.edu/shortmenu.aspx?sName=Penn+State+Housing+and+Food+Services&locationNum=17&locationName=North+Food+District&naFlag=1"
     ]
     for i in range(0, len(urls)):
-        page = urllib2.urlopen(urls[i])
+        page = urlfetch(urls[i])
         soup = BeautifulSoup(page, 'html.parser')
-        span = soup.find_all('span', class_='datelinks')
-        for datelinks in span.find_all('a', attrs = {'href'}):
-            page = urllib2.urlopen(datelinks.get_text())
+        spans = soup.find_all('span', class_='datelinks')
+        datelinks = []
+        for span in spans: 
+            link = span.find('a', href=True)
+            datelinks.append(link['href'])
+        for j in range(0,len(datelinks)):
+            page = urlfetch("http://menu.hfs.psu.edu/"+datelinks[j])
             # parse the html using beautiful soup and store in variable `soup`
             soup = BeautifulSoup(page, 'html.parser')
-            location = soup.find('h1').get_text()
-            date = parse_month(soup.find('h4'),get_text())
+            location = soup.find('h1').get_text().encode("utf-8")
+            location = location.replace("\r\n","").strip(' \t\n\r')
+            date = parse_month(soup.find('h4').get_text())
             for col in soup.find_all('td', class_='colMenu'):
                 for meal_time in col.find_all('td',class_='meal-header'):
                     meal = meal_time.get_text()
@@ -73,9 +81,8 @@ def scrape_menus():
                         items =  col.find_all('div', class_='shortmenurecipes')
                         food_items =""
                         for item in items: 
-                            food_items += item.get_text() +","
-                    
-
-
+                            food = item.get_text().strip()
+                            food_items += food +", "
+                        update_menu(date,location,meal,food_items)
 
 scrape_menus()

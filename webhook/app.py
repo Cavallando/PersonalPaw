@@ -1,8 +1,5 @@
 # -*- coding:utf8 -*-
 # !/usr/bin/env python
-from urllib.parse import urlparse, urlencode
-from urllib.request import urlopen, Request
-from urllib.error import HTTPError
 import time
 import json
 import os
@@ -12,6 +9,8 @@ from flask import request
 from flask import make_response
 
 from db.models import *
+
+
 
 # Flask app should start in global layout
 app = Flask(__name__)
@@ -33,6 +32,7 @@ def webhook():
 
 
 def processRequest(req):
+    #Request is name of Intent on DialogFlow
     if req.get("result").get("action") == "menu.lookup":
         parameters = req.get("parameters")
         date = parameters['date']
@@ -43,7 +43,7 @@ def processRequest(req):
     return res
 
 def makeWebhookResult(data):
-    speech = data['menu'] + " is serving: \n "+ data['food_items']
+    speech = "For " + data['menu']+", " + data['location'] + " is serving: \n "+ data['food_items']
 
     return {
         "speech": speech,

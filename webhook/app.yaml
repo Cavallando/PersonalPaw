@@ -4,10 +4,17 @@ threadsafe: true
 
 handlers:
 - url: /.*
-  script: app.app
+  script: dining_commons.app
+
+env_variables:
+  CLOUDSQL_CONNECTION_NAME: roar-pennstate:us-east4:roardb
+  CLOUDSQL_USER: root
+  CLOUDSQL_PASSWORD: root
 
 libraries:
 - name: flask
   version: 0.12
 - name: lxml
   version: 3.7.3
+- name: MySQLdb
+  version: "latest"

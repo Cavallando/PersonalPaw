@@ -11,7 +11,7 @@ from flask import make_response
 from db.menu_models import *
 
 import courses_crawler
-
+import athletics_crawler
 #Google Maps API
 #AIzaSyB6ByDVZ9g2cXdnPqd0rgBSuceK66j6K2A
 
@@ -68,7 +68,15 @@ def makeWebhookResult(payload):
     }
 
 def makeAthleticEventPayload(data):
-    data= data
+    sport = data['sport']
+    event_list = []
+    if sport:
+        event_list = athletics_crawler.search_event({'date':data['date']})
+    else:
+        event_list = athletics_crawler.search_event({'date':data['date'],'sport':sport})
+    event = event_list[0]
+    payload = "Here are the event: " + +event['date']+":"+event['event']
+    return makeWebhookResult(payload)
 
 
 def makeBuildingWebhookPayload(data):
@@ -84,17 +92,8 @@ def makeCourseWebhookPayload(data):
 
 def makeMenuWebhookPayload(data):
     foodList = data['food_items'].split(", ")
-    food_items = ""
-    if (len(foodList) > 5):
-        for i in range(0,5):
-            food_items += foodList[i] +"<br/>"
-        food_items = food_items.rstrip(", ")
-        food_items += "The full menu can be found <a href='http://menu.hfs.psu.edu'>here</a>."
-        
-    else:
-        food_items =data['food_items']
-    speech = "For " + data['menu']+", " + data['location'] + " is serving: "+food_items
-    payload = json.dumps({'text':speech,'link':"",'image':''})
+    speech = "For " + data['menu']+", " + data['location'] + " is serving: "
+    payload = json.dumps({'text':speech,'food_items': foodList})
     return makeWebhookResult(payload)
 
 if __name__ == "__main__":

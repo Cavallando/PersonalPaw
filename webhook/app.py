@@ -10,6 +10,10 @@ from flask import make_response
 
 from db.menu_models import *
 
+import courses_crawler
+
+#Google Maps API
+#AIzaSyB6ByDVZ9g2cXdnPqd0rgBSuceK66j6K2A
 
 
 # Flask app should start in global layout
@@ -39,29 +43,59 @@ def processRequest(req):
         location = parameters["dining_commons"]
         menu = parameters["menu"]
         data = {'date':date,'location':location,'menu':menu,'food_items':select_menu(date,location, menu)}
-        res = makeWebhookResult(data)
+        res = makeMenuWebhookPayload(data)
         return res
-
-def makeWebhookResult(data):
-    foodList = data['food_items'].split(", ")
-    food_items = ""
-    if (len(foodList) > 5):
-        for i in range(0,5):
-            food_items += foodList[i] +", "
-        food_items = food_items.rstrip(", ")
-        food_items += "\nThe full menu can be found at http://menus.hfs.psu.edu\n"
+    elif req.get("result").get("action") in "course.lookup":
+        parameters = req.get("result").get("parameters")
+        searchString = parameters['course_list'] + "+" + str(parameters['number-integer'])
+        return makeCourseWebhookPayload(courses_crawler.search_course(searchString))
+    elif req.get("result").get("action") in "building.lookup":
+        parameters = req.get("result").get("parameters")
+        return makeBuildingWebhookPayload(parameters['building'])
+    elif req.get("result").get("action") in "event.athletics.lookup":
+        parameters = req.get("result").get("parameters")
+        data = {'date':parameters['date'],'sport':parameters.get("sport", ""),'gender':parameters.get("gender", "")}
+        return makeAthleticEventPayload(data)
         
-    else:
-        food_items =data['food_items'].rstrip(",")
-    speech = "For " + data['menu']+", " + data['location'] + " is serving: \r\n "+food_items
 
+def makeWebhookResult(payload):
     return {
-        "speech": speech,
-        "displayText": speech,
+        "speech": payload,
+        "displayText": payload,
         # "data": data,
         # "contextOut": [],
         "source": "webhook"
     }
+
+def makeAthleticEventPayload(data):
+    data= data
+
+
+def makeBuildingWebhookPayload(data):
+    addressURL = data + "%2C University Park%2C PA"
+    addressURL = addressURL.replace(" ", "+")
+    key="AIzaSyCeehrTvN-wy1sJUqP5B-D4wRXZsKHE6Fc"
+    payload = json.dumps({'text': "Here is the location of "+data+": ", 'link':"https://www.google.com/maps/search/?api=1&query="+addressURL, 'image':"https://maps.googleapis.com/maps/api/staticmap?center="+addressURL+"&zoom=15&size=200x200&key="+key})
+    return makeWebhookResult(payload)
+
+def makeCourseWebhookPayload(data):
+    payload = json.dumps({'text':"Here are your results: " + data,'link':"",'image':''})
+    return makeWebhookResult(payload)
+
+def makeMenuWebhookPayload(data):
+    foodList = data['food_items'].split(", ")
+    food_items = ""
+    if (len(foodList) > 5):
+        for i in range(0,5):
+            food_items += foodList[i] +"<br/>"
+        food_items = food_items.rstrip(", ")
+        food_items += "The full menu can be found <a href='http://menu.hfs.psu.edu'>here</a>."
+        
+    else:
+        food_items =data['food_items']
+    speech = "For " + data['menu']+", " + data['location'] + " is serving: "+food_items
+    payload = json.dumps({'text':speech,'link':"",'image':''})
+    return makeWebhookResult(payload)
 
 if __name__ == "__main__":
     app.run()

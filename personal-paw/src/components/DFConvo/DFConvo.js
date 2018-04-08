@@ -1,6 +1,6 @@
 import React from 'react';
 
-import './DFConvo.css'
+import './DFConvo.css';
 import sendText from '../../assets/js/demoFunctions.js';
 
 class DFConvo extends React.Component {
@@ -80,7 +80,7 @@ class DFConvo extends React.Component {
                     />
                 </form>
                 {this.state.querying &&
-                        <ul className="">
+                        <ul className="scrollable">
                             {this.state.convo}
                         </ul>
                 }
@@ -114,10 +114,10 @@ const ResponseNode = ({ response }) => {
                 {data.image &&
                     <div className="card">
                         <div className="card-image">
-                            <img src={data.image} alt={data.text} />
+                            <img style={{maxHeight: "200px", maxWidth:"200px"}} src={data.image} alt={data.text} />
                         </div>
-                        <div className="card-action">
-                            <a href={data.link}>{data.location}</a>
+                        <div style={{ wordWrap: "break-word", maxWidth:"200px"}} className="card-action">
+                            <a style={{ wordWrap: "break-word"}} href={data.link}>{data.location}</a>
                         </div>
                     </div>
                 }
@@ -133,10 +133,12 @@ const ResponseNode = ({ response }) => {
                 }
                 {data.event &&
                     <div className="card-panel">
-                        {data.event.sport} <br />
-                        {data.event.location} <br />
-                        {data.event.date} <br />
-                        {data.event.description}
+                        {data.event.sport ? <div>{data.text}</div> : data.text}
+                        {data.event.sport && <div>{data.event.sport}</div>}
+                        {data.event.summary && <div>{data.event.summary}</div>}
+                        {data.event.location && <div>{data.event.location}</div>}
+                        {data.event.date && <div>{data.event.date}</div>}
+                        {data.event.sport ? data.event.description : <a href={data.event.description}>here.</a>}
                     </div>
                 }
             </li>

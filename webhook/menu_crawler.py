@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from db.menu_models import *
+from menu_models import *
 import re
 from datetime import date
 

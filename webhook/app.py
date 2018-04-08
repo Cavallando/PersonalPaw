@@ -8,7 +8,7 @@ from flask import Flask
 from flask import request
 from flask import make_response
 import datetime
-from db.menu_models import *
+from menu_models import *
 
 import courses_crawler
 import athletics_crawler
@@ -62,7 +62,7 @@ def processRequest(req):
 def makeWebhookResult(payload):
     return {
         "speech": payload,
-        "displayText": "",
+        "displayText": payload,
         # "data": data,
         # "contextOut": [],
         "source": "webhook"
@@ -70,7 +70,6 @@ def makeWebhookResult(payload):
 
 def makeAthleticEventPayload(data):
     event = {}
-    events = []
     payload=""
     text =""
     if ("NEXT" in data['query'].upper()):
@@ -80,34 +79,30 @@ def makeAthleticEventPayload(data):
             data['date'] = datetime.date.today().strftime('%Y-%m-%d')
             event = athletics_crawler.next_event(data)
         if not event:
-            text = "I'm sorry, I couldn't locate that event!"
+            text = "I'm sorry, I couldn't locate any event from your search. The full calendar of events can be found "
         else:
-            day = datetime.date(day=int(event['date'][8:10]), month=int(event['date'][5:7]), year=int(event['date'][:4])).strftime('%A, %d %B %Y')
+            data['date'] = datetime.date(day=int(event['date'][8:10]), month=int(event['date'][5:7]), year=int(event['date'][:4])).strftime('%A, %d %B %Y')
                 
-            text = "The next event is for "+event['sport']+ " is on "+ day +""
+            text = "The next event is for "+event['sport']+ " is on "+ data['date'] +""
     else:
         if data['date']:
-            events = athletics_crawler.search_events_by_date(data)
-            if not events:
-                text = "I'm sorry, I couldn't locate that event!"
+            event = athletics_crawler.search_events_by_date(data)
+            if not event:
+                text = "I'm sorry, I couldn't locate any event from your search. The full calendar of events can be found "
             else:
-                day = datetime.date(day=int(data['date'][8:10]), month=int(data['date'][5:7]), year=int(data['date'][:4])).strftime('%A, %d %B %Y')
-                text = "Here are the events for "+day+": "
+                data['date'] = datetime.date(day=int(data['date'][8:10]), month=int(data['date'][5:7]), year=int(data['date'][:4])).strftime('%A, %d %B %Y')
+                text = "This event is on "+data['date']+": "
         elif data['sport']:
-            events = athletics_crawler.search_event_by_sport(data)
-            if not events:
-                text = "I'm sorry, I couldn't locate that event!"
+            event = athletics_crawler.search_event_by_sport(data)
+            if not event:
+                text = "I'm sorry, I couldn't locate any event from your search. The full calendar of events can be found "
             else:
-                e = events[0]
-                day = date(day=e['date'][8:10], month=int(e['date'][5:7]), year=int(e['date'][:4])).strftime('%A, %d %B %Y')
-                text = "The next event is on " + day + ": "
-    if not event and not events:
-        payload = json.dumps({"text":text,"event":""})
-    elif event and not events:
-        events.append(event)
-        payload = json.dumps({"text":text,"event":events[0]})
+                data['date'] = datetime.date(day=int(event['date'][8:10]), month=int(event['date'][5:7]), year=int(event['date'][:4])).strftime('%A, %d %B %Y')
+                text = "The next event is on " + data['date']+ ": "
+    if not event:
+        payload = json.dumps({"text":text,"event":{"summary":"","date":"","sport":"","location":"","description":"http://www.gopsusports.com/calendar/events/"}})
     else:
-        payload = json.dumps({"text":text,"event":events[0]})
+        payload = json.dumps({"text":text,"event":event})
 
     return makeWebhookResult(payload)
 
@@ -130,5 +125,5 @@ def makeMenuWebhookPayload(data):
     return makeWebhookResult(payload)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
 

@@ -43,42 +43,46 @@ def processRequest(req):
         location = parameters["dining_commons"]
         menu = parameters["menu"]
         data = {'date':date,'location':location,'menu':menu,'food_items':select_menu(date,location, menu)}
-        res = makeMenuWebhookResult(data)
+        res = makeMenuWebhookPayload(data)
         return res
     elif req.get("result").get("action") in "course.lookup":
         parameters = req.get("result").get("parameters")
         searchString = parameters['course_list'] + "+" + str(parameters['number-integer'])
-        return makeCourseWebhookResult(courses_crawler.search_course(searchString))
+        return makeCourseWebhookPayload(courses_crawler.search_course(searchString))
     elif req.get("result").get("action") in "building.lookup":
         parameters = req.get("result").get("parameters")
-        return makeBuildingWebhookResult(parameters['building'])
+        return makeBuildingWebhookPayload(parameters['building'])
+    elif req.get("result").get("action") in "event.athletics.lookup":
+        parameters = req.get("result").get("parameters")
+        data = {'date':parameters['date'],'sport':parameters.get("sport", ""),'gender':parameters.get("gender", "")}
+        return makeAthleticEventPayload(data)
+        
+
+def makeWebhookResult(payload):
+    return {
+        "speech": payload,
+        "displayText": payload,
+        # "data": data,
+        # "contextOut": [],
+        "source": "webhook"
+    }
+
+def makeAthleticEventPayload(data):
+    data= data
 
 
-def makeBuildingWebhookResult(data):
+def makeBuildingWebhookPayload(data):
     addressURL = data + "%2C University Park%2C PA"
     addressURL = addressURL.replace(" ", "+")
     key="AIzaSyCeehrTvN-wy1sJUqP5B-D4wRXZsKHE6Fc"
-    speech = "Here is the location of "+data+": <br/>"
-    speech += "<a href='https://www.google.com/maps/search/?api=1&query="+addressURL+"'><img src='https://maps.googleapis.com/maps/api/staticmap?center="+addressURL+"&zoom=15&size=200x200&key="+key+"'></img></a>"
-    return {
-        "speech": speech,
-        "displayText": speech,
-        # "data": data,
-        # "contextOut": [],
-        "source": "webhook"
-    }
+    payload = json.dumps({'text': "Here is the location of "+data+": ", 'link':"https://www.google.com/maps/search/?api=1&query="+addressURL, 'image':"https://maps.googleapis.com/maps/api/staticmap?center="+addressURL+"&zoom=15&size=200x200&key="+key})
+    return makeWebhookResult(payload)
 
-def makeCourseWebhookResult(data):
-    speech = "Here are your results: <br/>" + data
-    return {
-        "speech": speech,
-        "displayText": speech,
-        # "data": data,
-        # "contextOut": [],
-        "source": "webhook"
-    }
+def makeCourseWebhookPayload(data):
+    payload = json.dumps({'text':"Here are your results: " + data,'link':"",'image':''})
+    return makeWebhookResult(payload)
 
-def makeMenuWebhookResult(data):
+def makeMenuWebhookPayload(data):
     foodList = data['food_items'].split(", ")
     food_items = ""
     if (len(foodList) > 5):
@@ -89,15 +93,9 @@ def makeMenuWebhookResult(data):
         
     else:
         food_items =data['food_items']
-    speech = "For " + data['menu']+", " + data['location'] + " is serving: <br/> "+food_items
-
-    return {
-        "speech": speech,
-        "displayText": speech,
-        # "data": data,
-        # "contextOut": [],
-        "source": "webhook"
-    }
+    speech = "For " + data['menu']+", " + data['location'] + " is serving: "+food_items
+    payload = json.dumps({'text':speech,'link':"",'image':''})
+    return makeWebhookResult(payload)
 
 if __name__ == "__main__":
     app.run()

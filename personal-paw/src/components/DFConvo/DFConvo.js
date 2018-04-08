@@ -79,10 +79,12 @@ class DFConvo extends React.Component {
                         onChange={e => this.updateQueryState(e)}
                     />
                 </form>
-                {this.state.querying &&
+                {this.state.querying && 
+                        <div className="noscroll">
                         <ul className="scrollable">
                             {this.state.convo}
                         </ul>
+                        </div>
                 }
             </div>
         );
@@ -90,7 +92,7 @@ class DFConvo extends React.Component {
 }
 
 const QueryNode = ({ query }) => (
-    <li className="clearfix right-align right card-panel blue-grey hoverable">
+    <li style={{margin:"5%",color:"white"}}className="clearfix right-align right card-panel blue-grey hoverable">
         {query}
     </li>
 );

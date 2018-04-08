@@ -1,17 +1,26 @@
 .content {
     max-width: 150%;
     width: 50%;
-    overflow: auto;
+    overflow-x: hidden;
     margin: auto;
 }
 
 .scrollable {
-    overflow: scroll;
+    overflow: auto;
+    overflow-x: hidden;
     bottom: 0;
-    height: 350px;
+    height: 500px;
+    max-height: 600px;
 }
 
-.food .card-panel a{
+.noscroll{
+    max-height: 100%;
+    width: 106%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.card-panel a{
     color: #607d8b;
 }
 

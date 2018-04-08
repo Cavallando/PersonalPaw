@@ -43,13 +43,7 @@ body {
 }
 div.header {
     display: inline-block;
-    text-shadow: 2px 2px #000000;
-}
-
-div.convo{
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
+    text-shadow: -4px 4px 40px #000000;
 }
 
 .title {

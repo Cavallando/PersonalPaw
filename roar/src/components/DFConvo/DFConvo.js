@@ -100,6 +100,15 @@ const ResponseNode = ({ response }) => {
 
     try {
         data = JSON.parse(response);
+        // console.log(data)
+
+        let menu = null;
+        if (data.food_items) {
+            menu = data.food_items.map(item => (
+                <li key={Math.random().toString(36).substr(2, 18)}>{item}</li>
+            ))
+        }
+
         return (
             <li className="clearfix right-align right card-panel blue-text text-darken-2 hoverable">
                 {data.text}
@@ -109,6 +118,15 @@ const ResponseNode = ({ response }) => {
                         <a href={data.link}>
                             <img src={data.image} alt={data.text} />
                         </a>
+                    </div>
+                }
+                {data.food_items &&
+                    <div>
+                        <ul>
+                            {menu}
+                        </ul>
+                        The full menu can be found at
+                        <a href="http://menu.hfs.psu.edu"> http://menu.hft.psu.edu</a>
                     </div>
                 }
             </li>

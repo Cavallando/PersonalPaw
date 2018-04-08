@@ -83,7 +83,7 @@ def makeAthleticEventPayload(data):
         else:
             data['date'] = datetime.date(day=int(event['date'][8:10]), month=int(event['date'][5:7]), year=int(event['date'][:4])).strftime('%A, %d %B %Y')
                 
-            text = "The next event is for "+event['sport']+ " is on "+ data['date'] +""
+            text = "The next "+shortSport(event['sport'])+ " event is on "+ data['date'] +""
     else:
         if data['date']:
             event = athletics_crawler.search_events_by_date(data)
@@ -102,10 +102,14 @@ def makeAthleticEventPayload(data):
     if not event:
         payload = json.dumps({"text":text,"event":{"summary":"","date":"","sport":"","location":"","description":"http://www.gopsusports.com/calendar/events/"}})
     else:
+        event['sport']=shortSport(event['sport'].strip())
         payload = json.dumps({"text":text,"event":event})
 
     return makeWebhookResult(payload)
 
+def shortSport(data):
+    sports = {"Baseball":"Baseball","FBALL":"Football","Hockey":"Hockey","BBALL":"Basketball","Cross Country":"Cross Country","Fence":"Fencing","Golf":"Golf","GYM":"Gymnastics","LAX":"Lacrosse","SWIM":	"Swimming & Diving","TNNS":"Tennis","Track":"Track & Field","VB":"Volleyball","Men's Wrestling":"Wrestling","SB":"Softball"}
+    return sports[data]
 
 def makeBuildingWebhookPayload(data):
     addressURL = data + "%2C University Park%2C PA"

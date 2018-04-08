@@ -82,27 +82,32 @@ def makeAthleticEventPayload(data):
         if not event:
             text = "I'm sorry, I couldn't locate that event!"
         else:
-            text = "Here is the next event: "
+            day = datetime.date(day=int(event['date'][8:10]), month=int(event['date'][5:7]), year=int(event['date'][:4])).strftime('%A, %d %B %Y')
+                
+            text = "The next event is for "+event['sport']+ " is on "+ day +""
     else:
         if data['date']:
             events = athletics_crawler.search_events_by_date(data)
             if not events:
                 text = "I'm sorry, I couldn't locate that event!"
             else:
-                text = "Here are the events for "+data['date']+": "
+                day = datetime.date(day=int(data['date'][8:10]), month=int(data['date'][5:7]), year=int(data['date'][:4])).strftime('%A, %d %B %Y')
+                text = "Here are the events for "+day+": "
         elif data['sport']:
             events = athletics_crawler.search_event_by_sport(data)
             if not events:
                 text = "I'm sorry, I couldn't locate that event!"
             else:
-                text = "Here is the next event: "
+                e = events[0]
+                day = date(day=e['date'][8:10], month=int(e['date'][5:7]), year=int(e['date'][:4])).strftime('%A, %d %B %Y')
+                text = "The next event is on " + day + ": "
     if not event and not events:
-        payload = json.dumps({"text":text,"event_list":""})
+        payload = json.dumps({"text":text,"event":""})
     elif event and not events:
         events.append(event)
-        payload = json.dumps({"text":text,"event_list":events})
+        payload = json.dumps({"text":text,"event":events[0]})
     else:
-        payload = json.dumps({"text":text,"event_list":events})
+        payload = json.dumps({"text":text,"event":events[0]})
 
     return makeWebhookResult(payload)
 
@@ -111,7 +116,7 @@ def makeBuildingWebhookPayload(data):
     addressURL = data + "%2C University Park%2C PA"
     addressURL = addressURL.replace(" ", "+")
     key="AIzaSyCeehrTvN-wy1sJUqP5B-D4wRXZsKHE6Fc"
-    payload = json.dumps({'text': "Here is the location of "+data+": ", 'link':"https://www.google.com/maps/search/?api=1&query="+addressURL, 'image':"https://maps.googleapis.com/maps/api/staticmap?center="+addressURL+"&zoom=15&size=200x200&key="+key})
+    payload = json.dumps({'text': "Here is the location of "+data+": ", 'link':"https://www.google.com/maps/search/?api=1&query="+addressURL, 'image':"https://maps.googleapis.com/maps/api/staticmap?center="+addressURL+"&zoom=15&size=200x200&key="+key,"location":data})
     return makeWebhookResult(payload)
 
 def makeCourseWebhookPayload(data):

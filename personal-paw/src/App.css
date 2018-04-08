@@ -27,10 +27,6 @@
   box-shadow: 0 1px 0 0 #1b007a;
 }
 
-.card-panel {
-  color: white;
-}
-
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

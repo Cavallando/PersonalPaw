@@ -101,32 +101,46 @@ const ResponseNode = ({ response }) => {
     try {
         data = JSON.parse(response);
         // console.log(data)
-
+        
         let menu = null;
         if (data.food_items) {
             menu = data.food_items.map(item => (
                 <li key={Math.random().toString(36).substr(2, 18)}>{item}</li>
             ))
+        } 
+        let events = null;
+        if(data.event_list) {
+            events = data.event_list.map(item => (
+                <li key={Math.random().toString(36).substr(2, 18)}>{item.sport}<br />At {item.location}</li>
+            ))
         }
 
         return (
-            <li className="clearfix left-align left card-panel blue-grey-text hoverable">
-                {data.text}
+            <li className="clearfix left-align left blue-grey-text hoverable">
                 {data.image &&
-                    <div>
-                        <br/>
-                        <a href={data.link}>
+                    <div className="card">
+                        <div className="card-image">
                             <img src={data.image} alt={data.text} />
-                        </a>
+                        </div>
+                        <div className="card-action">
+                            <a href={data.link}>{data.location}</a>
+                        </div>
                     </div>
                 }
                 {data.food_items &&
-                    <div>
+                    <div className="food card-panel">
                         <ul>
                             {menu}
                         </ul>
                         The full menu can be found at
                         <a href="http://menu.hfs.psu.edu"> http://menu.hft.psu.edu</a>
+                    </div>
+                }
+                {data.event_list &&
+                    <div className="card-panel">
+                        <ul>
+                            {events}
+                        </ul>
                     </div>
                 }
             </li>

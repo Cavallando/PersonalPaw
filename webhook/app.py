@@ -8,7 +8,7 @@ from flask import Flask
 from flask import request
 from flask import make_response
 
-from models import *
+from db.menu_models import *
 
 
 

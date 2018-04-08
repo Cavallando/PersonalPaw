@@ -10,6 +10,11 @@ from flask import make_response
 
 from db.menu_models import *
 
+import courses_crawler
+import buildings_crawler
+
+#Google Maps API
+#AIzaSyB6ByDVZ9g2cXdnPqd0rgBSuceK66j6K2A
 
 
 # Flask app should start in global layout
@@ -39,21 +44,52 @@ def processRequest(req):
         location = parameters["dining_commons"]
         menu = parameters["menu"]
         data = {'date':date,'location':location,'menu':menu,'food_items':select_menu(date,location, menu)}
-        res = makeWebhookResult(data)
+        res = makeMenuWebhookResult(data)
         return res
+    elif req.get("result").get("action") in "course.lookup":
+        parameters = req.get("result").get("parameters")
+        searchString = parameters['course_list'] + "+" + str(parameters['number-integer'])
+        return makeCourseWebhookResult(courses_crawler.search_course(searchString))
+    elif req.get("result").get("action") in "building.lookup":
+        parameters = req.get("result").get("parameters")
+        return makeBuildingWebhookResult(parameters['building'])
 
-def makeWebhookResult(data):
+
+def makeBuildingWebhookResult(data):
+    key = "AIzaSyB6ByDVZ9g2cXdnPqd0rgBSuceK66j6K2A"
+    speech = "Here is the location of "+data+": <br/>"
+    speech += "<iframe width='600' height='450'frameborder='0' style='border:0' src='https://www.google.com/maps/embed/v1/place?key="+key+"&q=Space+Needle,Seattle+WA allowfullscreen></iframe>"
+    
+    return {
+        "speech": speech,
+        "displayText": speech,
+        # "data": data,
+        # "contextOut": [],
+        "source": "webhook"
+    }
+
+def makeCourseWebhookResult(data):
+    speech = "Here are your results: <br/>" + data
+    return {
+        "speech": speech,
+        "displayText": speech,
+        # "data": data,
+        # "contextOut": [],
+        "source": "webhook"
+    }
+
+def makeMenuWebhookResult(data):
     foodList = data['food_items'].split(", ")
     food_items = ""
     if (len(foodList) > 5):
         for i in range(0,5):
-            food_items += foodList[i] +", "
+            food_items += foodList[i] +"<br/>"
         food_items = food_items.rstrip(", ")
-        food_items += "\nThe full menu can be found at http://menus.hfs.psu.edu\n"
+        food_items += "The full menu can be found <a href='http://menu.hfs.psu.edu'>here</a>."
         
     else:
-        food_items =data['food_items'].rstrip(",")
-    speech = "For " + data['menu']+", " + data['location'] + " is serving: \r\n "+food_items
+        food_items =data['food_items']
+    speech = "For " + data['menu']+", " + data['location'] + " is serving: <br/> "+food_items
 
     return {
         "speech": speech,

@@ -79,7 +79,7 @@ def search_event_by_sport(data):
     event_list = get_events()
     sport = data['sport'].strip()
     for event in event_list:
-        if(sport in event['sport']):
+        if(sport in event['sport'] and datetime.date.today().strftime('%Y-%m-%d')<=event['date']):
             return event
     return None
 

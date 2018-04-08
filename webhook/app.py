@@ -48,7 +48,7 @@ def processRequest(req):
     elif req.get("result").get("action") in "course.lookup":
         parameters = req.get("result").get("parameters")
         searchString = parameters['course_list'] + "+" + str(parameters['number-integer'])
-        return makeCourseWebhookPayload(courses_crawler.search_course(searchString))
+        return makeCourseWebhookPayload({'course':courses_crawler.search_course(searchString)})
     elif req.get("result").get("action") in "building.lookup":
         parameters = req.get("result").get("parameters")
         return makeBuildingWebhookPayload(parameters['building'])
@@ -74,7 +74,7 @@ def makeAthleticEventPayload(data):
     text =""
     if ("NEXT" in data['query'].upper()):
         if data['sport']:
-            event = athletics_crawler.search_by_sport(data)
+            event = athletics_crawler.search_event_by_sport(data)
         else:
             data['date'] = datetime.date.today().strftime('%Y-%m-%d')
             event = athletics_crawler.next_event(data)
@@ -115,7 +115,7 @@ def makeBuildingWebhookPayload(data):
     return makeWebhookResult(payload)
 
 def makeCourseWebhookPayload(data):
-    payload = json.dumps({'text':"Here are your results: " + data,'link':"",'image':''})
+    payload = json.dumps({'text':data,'link':"",'image':''})
     return makeWebhookResult(payload)
 
 def makeMenuWebhookPayload(data):

@@ -125,12 +125,17 @@ const ResponseNode = ({ response }) => {
                 }
                 {data.food_items &&
                     <div className="food card-panel">
-                        Here is the menu for {data.menu} at {data.dining_commons}
+                        <strong>{data.text}</strong>
                         <ul>
                             {menu}
                         </ul>
                         The full menu can be found at
                         <a href="http://menu.hfs.psu.edu"> http://menu.hft.psu.edu</a>
+                    </div>
+                }
+                {data.text.course &&
+                    <div className="card-panel">
+                        {data.text.course}
                     </div>
                 }
                 {data.event &&
@@ -139,7 +144,6 @@ const ResponseNode = ({ response }) => {
                         {data.event.sport && <div>{data.event.sport}</div>}
                         {data.event.summary && <div>{data.event.summary}</div>}
                         {data.event.location && <div>{data.event.location}</div>}
-                        {data.event.date && <div>{data.event.date}</div>}
                         {data.event.sport ? data.event.description : <a href={data.event.description}>here.</a>}
                     </div>
                 }

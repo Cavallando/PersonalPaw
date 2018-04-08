@@ -11,7 +11,6 @@ from flask import make_response
 from db.menu_models import *
 
 import courses_crawler
-import buildings_crawler
 
 #Google Maps API
 #AIzaSyB6ByDVZ9g2cXdnPqd0rgBSuceK66j6K2A
@@ -56,10 +55,11 @@ def processRequest(req):
 
 
 def makeBuildingWebhookResult(data):
-    key = "AIzaSyB6ByDVZ9g2cXdnPqd0rgBSuceK66j6K2A"
+    addressURL = data + "%2C University Park%2C PA"
+    addressURL = addressURL.replace(" ", "+")
+    key="AIzaSyCeehrTvN-wy1sJUqP5B-D4wRXZsKHE6Fc"
     speech = "Here is the location of "+data+": <br/>"
-    speech += "<iframe width='600' height='450'frameborder='0' style='border:0' src='https://www.google.com/maps/embed/v1/place?key="+key+"&q=Space+Needle,Seattle+WA allowfullscreen></iframe>"
-    
+    speech += "<a href='https://www.google.com/maps/search/?api=1&query="+addressURL+"'><img src='https://maps.googleapis.com/maps/api/staticmap?center="+addressURL+"&zoom=15&size=200x200&key="+key+"'></img></a>"
     return {
         "speech": speech,
         "displayText": speech,

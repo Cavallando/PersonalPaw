@@ -1,11 +1,15 @@
 .content {
+    max-width: 150%;
     width: 50%;
-    height: 100%;
+    overflow: auto;
     margin: auto;
 }
 
 .scrollable {
-    overflow: auto;
+    overflow: hidden;
     bottom: 0;
     height: 350px;
 }
+
+
+

@@ -80,9 +80,9 @@ class DFConvo extends React.Component {
                     />
                 </form>
                 {this.state.querying &&
-                    <ul className="scrollable">
-                        {this.state.convo}
-                    </ul>
+                        <ul className="">
+                            {this.state.convo}
+                        </ul>
                 }
             </div>
         );
@@ -90,7 +90,7 @@ class DFConvo extends React.Component {
 }
 
 const QueryNode = ({ query }) => (
-    <li className="clearfix left-align left card-panel light-blue darken-4">
+    <li className="clearfix right-align right card-panel blue-grey hoverable">
         {query}
     </li>
 );
@@ -110,7 +110,7 @@ const ResponseNode = ({ response }) => {
         }
 
         return (
-            <li className="clearfix right-align right card-panel blue-text text-darken-2 hoverable">
+            <li className="clearfix left-align left card-panel blue-grey-text hoverable">
                 {data.text}
                 {data.image &&
                     <div>
@@ -134,7 +134,7 @@ const ResponseNode = ({ response }) => {
     } catch (error) {
         data = response
         return (
-            <li className="clearfix right-align right card-panel blue-text text-darken-2 hoverable">
+            <li className="clearfix left-align left card-panel blue-grey-text hoverable">
                 {data}
             </li>
         );

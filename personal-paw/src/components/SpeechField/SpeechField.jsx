@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 // import PropTypes from 'prop-types';
 import './SpeechField.css';
+import 'animate.css';
 import DFConvo from '../DFConvo/DFConvo'
 
 class SpeechField extends Component {
@@ -29,20 +30,12 @@ class SpeechField extends Component {
                 </div>
                 <div>
                     <center>
-                        <img
-                            src="http://www.personal.psu.edu/jok5517/personalpaw/logo1.png"
-                            alt="Personal Paw Logo"
-                            style={{
-                                width: "300px",
-                                height: "250px",
-                                marginTop: "8%",
-                            }}
-                        />
+                        <div className="header"><p style={{marginRight: "10px"}} className=" title mega animated fadeInLeftBig">Personal</p> <p className="title mega animated fadeInRightBig">Paw</p></div>
                     </center>
                 </div>
                 {
                     this.state.querying ?
-                        <DFConvo /> :
+                        <div className="convo"><DFConvo /></div> :
                         <div className="initial-content">
                             <input
                                 placeholder="Hey, ask me something..."

@@ -1,19 +1,13 @@
-# Roar (working title)
+# Personal Paw
 Natural Language Processor for Penn State sites and resources
 
-## TO DO
-  1. Webcrawlers
-      * [Penn State Dining Commons](http://menu.hfs.psu.edu)
-      * [FIS Rest API](https://apps.opp.psu.edu/fis-api/)
-      * [Penn State News](http://news.psu.edu)
-      * [Courses](http://undergraduate.bulletins.psu.edu)
-    
-  2. DB
-  3. FrontEnd
-
 ## Overview
+Personal Paw is a React Based web application designed to facilitate the access of Penn State Resources through Natural language processing and sleek design
 
-## Requirements
-
-
-## Installation Instructions
+## Local Runtime Setup Instructions
+  ### Front End
+    1. `cd personal-paw/personal-paw`
+    2. `npm install`
+  
+  ### Back End
+    

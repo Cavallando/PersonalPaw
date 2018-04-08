@@ -5,7 +5,7 @@ import datetime
 import re
 #def get_calendar(): 
 
-def search_event(data):
+def get_events():
     ics = open('files/events.ics','rb')
     cal = Calendar.from_ical(ics.read())
     eventList = []
@@ -22,19 +22,66 @@ def search_event(data):
                 description = description[:-150]
             description =  description.replace("\n","")
             sport = summary[summary.find("(")+1:summary.find(")")]
-            if(data.get('sport') is None):
-                if(data.get('date') in dtstart):
-                    eventList.append({'sport': sport, 'description':description, 'date':dtstart,'location':location})
-            elif(data.get('sport') in summary):
-                eventList.append({'sport': sport.encode('utf-8'), 'description':description, 'date':dtstart,'location':location})
+            eventList.append({'sport': sport, 'description':description, 'date':dtstart,'location':location})
         #if eventList:
         #    break
         #else:
         #    date = datetime.strptime(data['date'], fmt)
         #    date += datetime.timedelta(days=1)
         #    data['date'] = date.strftime(fmt)
-        return eventList
     ics.close()
+    return eventList
+
+def next_event(data):
+    event_list = get_events()
+    date = data['date']
+    while True:
+        for event in event_list:
+            if(date in event['date']):
+                return event
+        date = datetime.strptime(date, '%Y-%m-%d')
+        date += datetime.timedelta(days=1)
+        date = date.strftime('%Y-%m-%d')
+        if date[:4] == "2019":
+            return None
+
+def next_few_events(data):
+    event_list = get_events()
+    events=[]
+    for event in event_list:
+        if(data['date'] in event['date']):
+            if(len(events)==3):
+                break
+            events.append(event)
+            date = datetime.strptime(date, '%Y-%m-%d')
+            date += datetime.timedelta(days=1)
+            date = date.strftime('%Y-%m-%d')
+    return events
+
+def next_event_by_sport(data):
+    event_list = get_events()
+    sport = data['sport']
+    for event in event_list:
+        if(sport in event['sport']):
+            return event
+    return None
+
+def search_events_by_date(data):
+    event_list = get_events()
+    date = data['date']
+    events = []
+    for event in event_list:
+        if(date in event['date']):
+            events.append(event)
+    return events
+
+def search_event_by_sport(data):
+    event_list = get_events()
+    sport = data['sport']
+    for event in event_list:
+        if(sport in event['sport']):
+            return event
+    return None
 
 if __name__ == "__main__":
     search_event({'date':"2018-10-13"})

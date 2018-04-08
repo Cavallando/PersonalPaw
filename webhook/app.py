@@ -7,7 +7,7 @@ import os
 from flask import Flask
 from flask import request
 from flask import make_response
-
+import datetime
 from db.menu_models import *
 
 import courses_crawler
@@ -54,28 +54,56 @@ def processRequest(req):
         return makeBuildingWebhookPayload(parameters['building'])
     elif req.get("result").get("action") in "event.athletics.lookup":
         parameters = req.get("result").get("parameters")
-        data = {'date':parameters['date'],'sport':parameters.get("sport", ""),'gender':parameters.get("gender", "")}
+        query = req.get("result").get("resolvedQuery") 
+        data = {'query':query, 'date': parameters.get("date", ""),'sport':parameters.get("gender", "")+" "+parameters.get("sport", "")}
         return makeAthleticEventPayload(data)
         
 
 def makeWebhookResult(payload):
     return {
         "speech": payload,
-        "displayText": payload,
+        "displayText": "",
         # "data": data,
         # "contextOut": [],
         "source": "webhook"
     }
 
 def makeAthleticEventPayload(data):
-    sport = data['sport']
-    event_list = []
-    if sport:
-        event_list = athletics_crawler.search_event({'date':data['date']})
+    event = {}
+    events = []
+    payload=""
+    text =""
+    if ("NEXT" in data['query'].upper()):
+        if data['sport']:
+            event = athletics_crawler.next_event_by_sport(data)
+        else:
+            data['date'] = datetime.date.today().strftime('%Y-%m-%d')
+            event = athletics_crawler.next_event(data)
+        if not event:
+            text = "I'm sorry, I couldn't locate that event!"
+        else:
+            text = "Here is the next event: "
     else:
-        event_list = athletics_crawler.search_event({'date':data['date'],'sport':sport})
-    event = event_list[0]
-    payload = "Here are the event: " + +event['date']+":"+event['event']
+        if data['date']:
+            events = athletics_crawler.search_events_by_date(data)
+            if not events:
+                text = "I'm sorry, I couldn't locate that event!"
+            else:
+                text = "Here are the events for "+data['date']+": "
+        elif data['sport']:
+            events = athletics_crawler.search_event_by_sport(data)
+            if not events:
+                text = "I'm sorry, I couldn't locate that event!"
+            else:
+                text = "Here is the next event: "
+    if not event and not events:
+        payload = json.dumps({"text":text,"event_list":""})
+    elif event and not events:
+        events.append(event)
+        payload = json.dumps({"text":text,"event_list":events})
+    else:
+        payload = json.dumps({"text":text,"event_list":events})
+
     return makeWebhookResult(payload)
 
 

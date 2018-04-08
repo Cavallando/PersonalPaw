@@ -22,7 +22,7 @@ def get_events():
                 description = description[:-150]
             description =  description.replace("\n","")
             sport = summary[summary.find("(")+1:summary.find(")")]
-            eventList.append({'summary': summary.replace("("+sport+")",""),'sport': sport, 'description':description, 'date':dtstart,'location':location})
+            eventList.append({'summary': summary.replace("("+sport+")","").replace("(DH)",""),'sport': sport, 'description':description, 'date':dtstart,'location':location})
         #if eventList:
         #    break
         #else:
@@ -60,15 +60,16 @@ def next_few_events(data):
 
 def next_event_by_sport(data):
     event_list = get_events()
-    sport = data['sport']
+    sport = data['sport'].strip()
     for event in event_list:
         if(sport in event['sport']):
+            print("True")
             return event
     return None
 
 def search_events_by_date(data):
     event_list = get_events()
-    date = data['date']
+    date = data['date'].strip()
     for event in event_list:
         if(date in event['date']):
             return event
@@ -76,7 +77,7 @@ def search_events_by_date(data):
 
 def search_event_by_sport(data):
     event_list = get_events()
-    sport = data['sport']
+    sport = data['sport'].strip()
     for event in event_list:
         if(sport in event['sport']):
             return event

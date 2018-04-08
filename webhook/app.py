@@ -74,7 +74,7 @@ def makeAthleticEventPayload(data):
     text =""
     if ("NEXT" in data['query'].upper()):
         if data['sport']:
-            event = athletics_crawler.next_event_by_sport(data)
+            event = athletics_crawler.search_by_sport(data)
         else:
             data['date'] = datetime.date.today().strftime('%Y-%m-%d')
             event = athletics_crawler.next_event(data)

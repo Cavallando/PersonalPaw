@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-"use strict";
+// "use strict";
 var ApiAi = require('api-ai-javascript');
 /**
  * All this stuff is moved into global namespace and separate files just to be

@@ -1,0 +1,11 @@
+.content {
+    width: 50%;
+    height: 100%;
+    margin: auto;
+}
+
+.scrollable {
+    overflow: auto;
+    bottom: 0;
+    height: 350px;
+}

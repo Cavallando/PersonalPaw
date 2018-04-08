@@ -97,21 +97,15 @@ const QueryNode = ({ query }) => (
 
 const ResponseNode = ({ response }) => {
     let data = null;
-
+    
     try {
         data = JSON.parse(response);
-        // console.log(data)
-        
+        console.log(data);
+
         let menu = null;
         if (data.food_items) {
             menu = data.food_items.map(item => (
                 <li key={Math.random().toString(36).substr(2, 18)}>{item}</li>
-            ))
-        } 
-        let events = null;
-        if(data.event_list) {
-            events = data.event_list.map(item => (
-                <li key={Math.random().toString(36).substr(2, 18)}>{item.sport}<br />At {item.location}</li>
             ))
         }
 
@@ -129,6 +123,7 @@ const ResponseNode = ({ response }) => {
                 }
                 {data.food_items &&
                     <div className="food card-panel">
+                        Here is the menu for {data.menu} at {data.dining_commons}
                         <ul>
                             {menu}
                         </ul>
@@ -136,11 +131,12 @@ const ResponseNode = ({ response }) => {
                         <a href="http://menu.hfs.psu.edu"> http://menu.hft.psu.edu</a>
                     </div>
                 }
-                {data.event_list &&
+                {data.event &&
                     <div className="card-panel">
-                        <ul>
-                            {events}
-                        </ul>
+                        {data.event.sport} <br />
+                        {data.event.location} <br />
+                        {data.event.date} <br />
+                        {data.event.description}
                     </div>
                 }
             </li>

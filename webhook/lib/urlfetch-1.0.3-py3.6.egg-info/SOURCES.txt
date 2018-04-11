@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST.in
+README.rst
+setup.cfg
+setup.py
+urlfetch.py
+urlfetch.useragents.list
+urlfetch.egg-info/PKG-INFO
+urlfetch.egg-info/SOURCES.txt
+urlfetch.egg-info/dependency_links.txt
+urlfetch.egg-info/top_level.txt

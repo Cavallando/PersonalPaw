@@ -1,85 +1,55 @@
 import requests
 from bs4 import BeautifulSoup
-from menu_models import *
 import re
 from datetime import date
 
-def parse_month(datetext):
-    dateStrip = datetext.replace("\r\n","").strip().encode("utf-8")
-    day = re.search("\s\d{1,2}", dateStrip).group().strip()
-    month = find_month(str(dateStrip.split()[1]))
-    return date(day=int(day), month=month, year=int(dateStrip[-4:])).strftime('%Y-%m-%d')
+import requests_toolbelt.adapters.appengine
 
-def find_month(strMonth):
-    if(strMonth == 'January'):
-        return 1
-    elif(strMonth == 'February'):
-        return 2
-    elif(strMonth == 'March'):
-        return 3
-    elif(strMonth == 'April'):
-        return 4
-    elif(strMonth == 'May'):
-        return 5
-    elif(strMonth == 'June'):
-        return 6
-    elif(strMonth == 'July'):
-        return 7
-    elif(strMonth == 'August'):
-        return 8
-    elif(strMonth == 'September'):
-        return 9
-    elif(strMonth == 'October'):
-        return 10
-    elif(strMonth == 'November'):
+# Use the App Engine Requests adapter. This makes sure that Requests uses
+# URLFetch.
+requests_toolbelt.adapters.appengine.monkeypatch()
+def getLocationNumber(location):
+    if(location=="Pollock Dining Commons"):
+        return 14
+    elif(location=="East Food District"):
         return 11
-    elif(strMonth == 'December'):
-        return 12
-        
+    elif(location=="South Food District"):
+        return 13
+    elif(location=="West Food District"):
+        return 16
+    elif(location=="North Food District"):
+        return 17
+    return 0
 
-def scrape_menus():
-    urls = [
-        "http://menu.hfs.psu.edu/shortmenu.aspx?sName=Penn+State+Housing+and+Food+Services&locationNum=11&locationName=East+Food+District&naFlag=1",
-        "http://menu.hfs.psu.edu/shortmenu.aspx?sName=Penn+State+Housing+and+Food+Services&locationNum=14&locationName=Pollock+Dining+Commons+&naFlag=1",
-        "http://menu.hfs.psu.edu/shortmenu.aspx?sName=Penn+State+Housing+and+Food+Services&locationNum=13&locationName=South+Food+District&naFlag=1",
-        "http://menu.hfs.psu.edu/shortmenu.aspx?sName=Penn+State+Housing+and+Food+Services&locationNum=16&locationName=West+Food+District&naFlag=1",
-        "http://menu.hfs.psu.edu/shortmenu.aspx?sName=Penn+State+Housing+and+Food+Services&locationNum=17&locationName=North+Food+District&naFlag=1"
-    ]
-    for i in range(0, len(urls)):
-        page = requests.get(urls[i]).text
-        soup = BeautifulSoup(page, 'html.parser')
-        spans = soup.find_all('span', class_='datelinks')
-        datelinks = []
-        for span in spans: 
-            link = span.find('a', href=True)
-            datelinks.append(link['href'])
-        for j in range(0,len(datelinks)):
-            page = requests.get("http://menu.hfs.psu.edu/"+datelinks[j]).text
-            # parse the html using beautiful soup and store in variable `soup`
-            soup = BeautifulSoup(page, 'html.parser')
-            location = soup.find('h1').get_text().encode("utf-8")
-            location = location.replace("\r\n","").strip(' \t\n\r')
-            date = parse_month(soup.find('h4').get_text())
-            for col in soup.find_all('td', class_='colMenu'):
-                for meal_time in col.find_all('td',class_='meal-header'):
-                    meal = meal_time.get_text()
-                    meal = meal.replace(" ","").encode("utf-8")
-                    meal = meal.replace("\r\n","")
-                    menuStr = ' '
-                    if("Breakfast" in meal):
-                        menuStr = 'breakfast'
-                    elif("Lunch" in meal):
-                        menuStr = 'lunch'
-                    elif("Dinner" in meal):
-                        menuStr = 'dinner'
-                    elif("4th Meal" in meal):
-                        menuStr = '4th meal'
-                    if(menuStr != ' '):
-                        items =  col.find_all('div', class_='shortmenurecipes')
-                        food_items =""
-                        for item in items: 
-                            food = item.get_text().strip()
-                            food_items += food +", "
-                        update_menu(date,location,meal,food_items)
+def scrape_menus(data):
+    locURL = data["dining_commons"].replace(" ","+")
+    locNum = getLocationNumber(data["dining_commons"])
+    dayStr = data["date"][8:10]
+    monthStr = data["date"][5:7]
+    if(dayStr[0:1]=="0"):
+        dayStr=dayStr[1:2]
+    if(monthStr[0:1]=="0"):
+        monthStr=monthStr[1:2]
+    dateURL = "&WeeksMenus=This+Week%27s+Menus&myaction=read&dtdate="+monthStr+"%2f"+dayStr+"%2f"+data["date"][0:4]
+    url = "http://menu.hfs.psu.edu/shortmenu.aspx?sName=Penn+State+Housing+and+Food+Services&locationNum="+str(locNum)+"&locationName=+"+locURL+"&naFlag=1"+dateURL
+    page = requests.get(url).text
+    soup = BeautifulSoup(page, 'html.parser')
+    for col in soup.find_all('td', class_='colMenu'):
+        for meal_time in col.find_all('td',class_='meal-header'):
+            meal = meal_time.get_text()
+            meal = meal.replace(" ","").encode("utf-8")
+            meal = meal.replace("\r\n","")
+            isMenu = False
+            if(data["menu"] in meal):
+                isMenu = True
+            else:
+                isMenu = False
+            if(isMenu):
+                items =  col.find_all('div', class_='shortmenurecipes')
+                food_items =""
+                for item in items: 
+                    food = item.get_text().strip()
+                    food_items += food +", "
+                return food_items
 
-scrape_menus()
+scrape_menus({"dining_commons":"Pollock Dining Commons","date":"2018-04-09","menu":"Breakfast"})

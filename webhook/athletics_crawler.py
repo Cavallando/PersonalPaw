@@ -1,8 +1,8 @@
 
 from icalendar import Calendar
-import urllib
 import datetime
 import re
+from google.appengine.api import urlfetch
 #def get_calendar(): 
 
 def get_events():

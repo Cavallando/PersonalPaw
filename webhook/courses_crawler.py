@@ -3,6 +3,11 @@ import re
 from bs4 import BeautifulSoup
 import requests
 
+import requests_toolbelt.adapters.appengine
+
+# Use the App Engine Requests adapter. This makes sure that Requests uses
+# URLFetch.
+requests_toolbelt.adapters.appengine.monkeypatch()
 #from db.menu_models import *
 
 course_search_url = "http://undergraduate.bulletins.psu.edu/search/?scontext=courses&search="

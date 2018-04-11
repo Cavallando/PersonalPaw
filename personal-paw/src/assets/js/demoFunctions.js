@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 // "use strict";
-var ApiAi = require('api-ai-javascript');
+var ApiAi = require('./api-ai-javascript');
 /**
  * All this stuff is moved into global namespace and separate files just to be
  * MAXIMUM clear and easy to understand
  */
 
 var client;
-client = new ApiAi.ApiAiClient({accessToken: "d6dc2a082e33460a98678c9131333db4"});
+client = new ApiAi.ApiAiClient({accessToken: "1da2bc7404e04f04ab935c986bec25be"});
 
 export default function sendText(text) {
   return client.textRequest(text);

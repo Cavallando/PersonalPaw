@@ -1,7 +1,0 @@
-../urlfetch.py
-../__pycache__/urlfetch.cpython-36.pyc
-../../../urlfetch.useragents.list
-PKG-INFO
-SOURCES.txt
-top_level.txt
-dependency_links.txt

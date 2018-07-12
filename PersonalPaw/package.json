@@ -7,7 +7,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "firebase": "^5.2.0",
     "react": "16.4.1",
     "react-native": "0.56.0",
     "react-native-material-ui": "^1.30.1",

@@ -3,9 +3,9 @@ package com.personalpaw;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import de.innfactory.apiai.RNApiAiPackage;
 import com.wenkesj.voice.VoicePackage;
 import com.oblador.vectoricons.VectorIconsPackage;
+import de.innfactory.apiai.RNApiAiPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -26,9 +26,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNApiAiPackage(),
             new VoicePackage(),
-            new VectorIconsPackage()
+            new VectorIconsPackage(),
+            new RNApiAiPackage()
       );
     }
 
